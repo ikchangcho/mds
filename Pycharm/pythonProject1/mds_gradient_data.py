@@ -47,12 +47,21 @@ for L in [5, 10, 15, 20, 25, 30]:      # Length of sequence
         # Generate random binary sequences
         s = np.random.randint(2, size=(N, L))
 
-        # Generate distance matrix
+        # Generate distance matrix (Model 1)
+        # D = np.zeros(shape=(N, N))
+        # for n in range(N1):
+        #     for m in range(N1, N):
+        #         D[n, m] = np.linalg.norm(s[n] - s[m])
+        #         D[m ,n] = D[n, m]
+
+        # Generate distance matrix (Model 2: Longest common subsequence)
         D = np.zeros(shape=(N, N))
         for n in range(N1):
             for m in range(N1, N):
-                D[n, m] = np.linalg.norm(s[n] - s[m])
-                D[m ,n] = D[n, m]
+                non_equal_positions = [-1] + [i for i in range(L) if s[n, i] != s[m, i]] + [L]
+                common_length = [non_equal_positions[i + 1] - non_equal_positions[i] - 1 for i in range(len(non_equal_positions) - 1)]
+                D[n, m] = L - max(common_length)
+                D[m, n] = D[n, m]
 
         # Obtain stress minimum for d = 1, 2, ... , N-1
         max_dim = min(L * 2, N + 5)
@@ -73,7 +82,7 @@ for L in [5, 10, 15, 20, 25, 30]:      # Length of sequence
         plt.plot(np.arange(3, max_dim + 1), min_normalized_stress[2:], marker='o')
         plt.title(f'Length = {L}, N1 = {N1}, N2 = {N2}')
         plt.xlabel('Dimension')
-        plt.ylabel('Stress')
+        plt.ylabel('Normalized Stress')
     #    plt.grid(True)  # Add grid for better readability
         plt.savefig(f'length{L}_{N1}+{N2}.png')
         np.savetxt(f'length{L}_{N1}+{N2}.csv', min_normalized_stress, delimiter=',', fmt='%.3f')
