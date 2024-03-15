@@ -1,6 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def stress_function(x, D):
+    stress = 0
+    for n in range(x.shape[0]):
+        for m in range(n + 1, x.shape[0]):
+            if D[n, m] > 0:
+                stress += (D[n, m] - np.linalg.norm(x[n] - x[m])) ** 2
+    return stress
+
 def compute_gradient(x, D):
     N, d = x.shape  # N points in d-dimensional space
     gradient = np.zeros_like(x)
@@ -16,14 +24,6 @@ def compute_gradient(x, D):
                     gradient[m] -= grad_nm  # Symmetry: grad_mn = -grad_nm
 
     return gradient
-
-def stress_function(x, D):
-    stress = 0
-    for n in range(x.shape[0]):
-        for m in range(n + 1, x.shape[0]):
-            if D[n, m] > 0:
-                stress += (D[n, m] - np.linalg.norm(x[n] - x[m])) ** 2
-    return stress
 
 def gradient_descent(x_init, D, alpha=0.01, max_iter=1000, tol=1e-6):
     x = x_init.copy()
@@ -46,14 +46,14 @@ L = 10      # Length of sequence
 # Generate random binary sequences
 s = np.random.randint(2, size=(N, L))
 
-# Generate distance matrix (Model 1)
+# Generate distance matrix (Model 1. Hamming distance)
 # D = np.zeros(shape=(N, N))
 # for n in range(N1):
 #     for m in range(N1, N):
 #         D[n, m] = np.linalg.norm(s[n] - s[m])
 #         D[m ,n] = D[n, m]
 
-# Generate distance matrix (Model 2: Longest common subsequence)
+# Generate distance matrix (Model 2. Longest common subsequence)
 D = np.zeros(shape=(N, N))
 for n in range(N1):
     for m in range(N1, N):
