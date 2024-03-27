@@ -72,8 +72,26 @@ x_final_sparse = gradient_descent(x_init, D_sparse)
 final_stress = stress_function(x_final, D)
 final_stress_sparse = stress_function(x_final_sparse, D_sparse)
 
+# Compute discrepancy
+discrepancy_squared_sum = 0
+for i in range(N):
+    for j in range(d):
+        discrepancy_squared_sum += (x_final[i, j] - x_final_sparse[i, j]) ** 2
+discrepancy_rms = np.sqrt(discrepancy_squared_sum / N)
+
+radius_squared_sum = 0
+center_final = np.mean(x_final, axis=0)
+centered_x_final = x_final - center_final
+for i in range(N):
+    for j in range(d):
+        radius_squared_sum += centered_x_final[i, j] ** 2
+radius_rms = np.sqrt(radius_squared_sum / N)
+
+normalized_discrepancy = discrepancy_rms / radius_rms   # Normalized discrepancy per point per dimension
+
 # Plotting
 plt.figure(figsize=(10, 5))
+plt. suptitle(f'Discrepancy: {normalized_discrepancy * 100: .1f}%')
 
 # Full distance matrix
 plt.subplot(1, 2, 1)
@@ -97,3 +115,4 @@ plt.text(0.05, 0.90, f'Final Stress: {final_stress_sparse:.2f}', transform=plt.g
 
 plt.tight_layout()
 plt.show()
+plt.savefig('/Users/ik/Pycharm/Project1/discrepancy10.png')
